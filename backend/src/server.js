@@ -15,13 +15,12 @@ const oneInchRoutes = require('./routes/oneInch');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const HOST = process.env.HOST || '0.0.0.0';
 
 // Allowed origins (local dev + deployed frontend)
 const allowedOrigins = [
-  'http://localhost:5173', // Vite dev server
-  'http://localhost:3000', // React dev server
-  process.env.FRONTEND_URL // Vercel production URL
+  'http://localhost:5173', // Vite dev
+  'http://localhost:3000', // CRA/Next dev
+  process.env.FRONTEND_URL // Production frontend URL
 ].filter(Boolean);
 
 app.use(cors({
@@ -97,10 +96,10 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
-const server = app.listen(PORT, HOST, () => {
-  log.info(`🚀 CosmosSwap - 1inch Fusion+ Extension Backend running on http://${HOST}:${PORT}`);
-  log.info(`📊 Health check: http://${HOST}:${PORT}/health`);
+// Start server — always bind to 0.0.0.0 for Render
+app.listen(PORT, '0.0.0.0', () => {
+  log.info(`🚀 CosmosSwap - 1inch Fusion+ Extension Backend running on http://0.0.0.0:${PORT}`);
+  log.info(`📊 Health check: http://0.0.0.0:${PORT}/health`);
   log.info(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
   log.info(`📍 Contract: ${process.env.ETHEREUM_CONTRACT_ADDRESS}`);
   log.info(`🔗 1inch Integration: ${process.env.ONEINCH_API_KEY ? 'Enabled' : 'Disabled'}`);
