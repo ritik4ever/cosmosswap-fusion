@@ -1,19 +1,5 @@
-const ONEINCH_API_KEY = import.meta.env?.VITE_ONEINCH_API_KEY
+const ONEINCH_API_KEY = import.meta.env.VITE_ONEINCH_API_KEY || ""
 const ONEINCH_BASE_URL = "https://api.1inch.dev"
-
-export interface QuoteParams {
-  fromTokenAddress: string
-  toTokenAddress: string
-  amount: string
-  fromAddress: string
-  slippage: number
-}
-
-export interface SwapParams extends QuoteParams {
-  destReceiver?: string
-  referrerAddress?: string
-  fee?: number
-}
 
 export interface SwapQuote {
   dstAmount: string
@@ -28,67 +14,36 @@ export interface TokenInfo {
 }
 
 export class OneInchApi {
-  private chainId: number
+  constructor(private chainId = 1) {}
 
-  constructor(chainId = 1) {
-    this.chainId = chainId
-  }
-
-  private async makeDirectRequest(endpoint: string, params: any = {}): Promise<any> {
+  private async request(endpoint: string, params: Record<string, any> = {}): Promise<any> {
     if (!ONEINCH_API_KEY) {
-      console.warn("1inch API key not found, using mock data")
-      return this.getMockData(endpoint, params)
+      console.warn("1inch API key missing — returning mock data")
+      return this.mockData(endpoint, params)
     }
 
-    try {
-      const url = new URL(`${ONEINCH_BASE_URL}/swap/v6.0/${this.chainId}${endpoint}`)
-      Object.keys(params).forEach((key) => {
-        if (params[key] !== undefined) {
-          url.searchParams.append(key, params[key])
-        }
-      })
+    const url = new URL(`${ONEINCH_BASE_URL}/swap/v6.0/${this.chainId}${endpoint}`)
+    Object.keys(params).forEach(key => params[key] && url.searchParams.append(key, params[key]))
 
-      console.log("🔗 1inch Direct API Call:", endpoint)
-
-      const response = await fetch(url.toString(), {
-        headers: {
-          Authorization: `Bearer ${ONEINCH_API_KEY}`,
-          Accept: "application/json",
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error(`1inch API error: ${response.status}`)
-      }
-
-      return await response.json()
-    } catch (error) {
-      console.error("1inch API call failed, using mock data:", error)
-      return this.getMockData(endpoint, params)
-    }
+    const res = await fetch(url.toString(), {
+      headers: { Authorization: `Bearer ${ONEINCH_API_KEY}`, Accept: "application/json" },
+    })
+    if (!res.ok) throw new Error(`1inch API error: ${res.status}`)
+    return res.json()
   }
 
-  private getMockData(endpoint: string, params: any): any {
+  private mockData(endpoint: string, params: any) {
     if (endpoint === "/quote") {
-      return {
-        dstAmount: (Number.parseFloat(params.amount || "1") * 245.8).toString(),
-        estimatedGas: "150000",
-      }
+      return { dstAmount: (parseFloat(params.amount || "1") * 245.8).toString(), estimatedGas: "150000" }
     }
     if (endpoint === "/tokens") {
-      return {
-        "0xA0b86a33E6441b8435b662f0E2d0B8A0E4B2B8B0": {
-          symbol: "ETH",
-          name: "Ethereum",
-          decimals: 18,
-        },
-      }
+      return { "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE": { symbol: "ETH", name: "Ethereum", decimals: 18 } }
     }
-    return { mock: true }
+    return {}
   }
 
-  async getQuote(params: QuoteParams): Promise<SwapQuote> {
-    return this.makeDirectRequest("/quote", {
+  async getQuote(params: any): Promise<SwapQuote> {
+    return this.request("/quote", {
       src: params.fromTokenAddress,
       dst: params.toTokenAddress,
       amount: params.amount,
@@ -97,8 +52,8 @@ export class OneInchApi {
     })
   }
 
-  async getSwapTransaction(params: SwapParams): Promise<any> {
-    return this.makeDirectRequest("/swap", {
+  async getSwapTransaction(params: any) {
+    return this.request("/swap", {
       src: params.fromTokenAddress,
       dst: params.toTokenAddress,
       amount: params.amount,
@@ -109,9 +64,8 @@ export class OneInchApi {
   }
 
   async getTokens(): Promise<Record<string, TokenInfo>> {
-    return this.makeDirectRequest("/tokens")
+    return this.request("/tokens")
   }
 }
 
-export const oneInchApi = new OneInchApi()
-export const oneInchService = oneInchApi // Export alias for compatibility
+export const oneInchService = new OneInchApi()

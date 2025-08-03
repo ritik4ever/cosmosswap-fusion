@@ -1,19 +1,7 @@
-"use client"
-
 import { useState, useCallback } from "react"
 import { oneInchService, type SwapQuote, type TokenInfo } from "../services/oneInchApi"
 
-interface UseOneInchReturn {
-  quote: SwapQuote | null
-  tokens: Record<string, TokenInfo>
-  isLoading: boolean
-  error: string | null
-  getQuote: (params: any) => Promise<void>
-  getTokens: () => Promise<void>
-  executeSwap: (params: any) => Promise<any>
-}
-
-export function useOneInch(): UseOneInchReturn {
+export function useOneInch() {
   const [quote, setQuote] = useState<SwapQuote | null>(null)
   const [tokens, setTokens] = useState<Record<string, TokenInfo>>({})
   const [isLoading, setIsLoading] = useState(false)
@@ -21,12 +9,10 @@ export function useOneInch(): UseOneInchReturn {
 
   const getQuote = useCallback(async (params: any) => {
     setIsLoading(true)
-    setError(null)
     try {
-      const result = await oneInchService.getQuote(params)
-      setQuote(result)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to get quote")
+      setQuote(await oneInchService.getQuote(params))
+    } catch (err: any) {
+      setError(err.message || "Failed to get quote")
     } finally {
       setIsLoading(false)
     }
@@ -34,12 +20,10 @@ export function useOneInch(): UseOneInchReturn {
 
   const getTokens = useCallback(async () => {
     setIsLoading(true)
-    setError(null)
     try {
-      const result = await oneInchService.getTokens()
-      setTokens(result)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to get tokens")
+      setTokens(await oneInchService.getTokens())
+    } catch (err: any) {
+      setError(err.message || "Failed to get tokens")
     } finally {
       setIsLoading(false)
     }
@@ -47,25 +31,15 @@ export function useOneInch(): UseOneInchReturn {
 
   const executeSwap = useCallback(async (params: any) => {
     setIsLoading(true)
-    setError(null)
     try {
-      const result = await oneInchService.getSwapTransaction(params)
-      return result
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to execute swap")
+      return await oneInchService.getSwapTransaction(params)
+    } catch (err: any) {
+      setError(err.message || "Failed to execute swap")
       throw err
     } finally {
       setIsLoading(false)
     }
   }, [])
 
-  return {
-    quote,
-    tokens,
-    isLoading,
-    error,
-    getQuote,
-    getTokens,
-    executeSwap,
-  }
+  return { quote, tokens, isLoading, error, getQuote, getTokens, executeSwap }
 }
