@@ -1,155 +1,146 @@
-import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
-import { COSMOS_CONTRACT_ADDRESS } from '../utils/constants'
+import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate"
+import { GasPrice } from "@cosmjs/stargate"
+import { COSMOS_RPC_URL, COSMOS_DENOMS } from "../utils/constants"
 
-interface SwapParams {
-  hashlock: string
-  timelock: number
-  receiverAddress: string
-  fromToken: string
+export interface CosmosBalance {
+  denom: string
   amount: string
 }
 
-export const cosmosService = {
-  async estimateGas(client: SigningCosmWasmClient, params: any): Promise<string> {
+export interface CosmosAccount {
+  address: string
+  balance: CosmosBalance[]
+}
+
+export class CosmosService {
+  private client: SigningCosmWasmClient | null = null
+
+  async connect(signer: any): Promise<CosmosAccount> {
     try {
-      const [account] = await client.getAccounts()
-      
-      const msg = {
-        initiate_swap: {
-          hashlock: params.hashlock,
-          timelock: params.timelock,
-          receiver: params.receiverAddress,
-          denom: params.fromToken === 'ATOM' ? 'uatom' : params.fromToken,
-          amount: (parseFloat(params.amount) * 1_000_000).toString(),
-        }
-      }
-
-      const gasEstimate = await client.simulate(
-        account.address,
-        [
-          {
-            typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
-            value: {
-              sender: account.address,
-              contract: COSMOS_CONTRACT_ADDRESS,
-              msg: Buffer.from(JSON.stringify(msg)),
-              funds: [
-                {
-                  denom: params.fromToken === 'ATOM' ? 'uatom' : params.fromToken,
-                  amount: (parseFloat(params.amount) * 1_000_000).toString(),
-                }
-              ],
-            },
-          },
-        ],
-        'Estimate gas for swap initiation'
-      )
-
-      return (gasEstimate * 0.000001).toFixed(6) // Convert to ATOM
-    } catch (error) {
-      console.error('Gas estimation failed:', error)
-      throw error
-    }
-  },
-
-  async initiateSwap(client: SigningCosmWasmClient, params: SwapParams): Promise<string> {
-    try {
-      const [account] = await client.getAccounts()
-      
-      const msg = {
-        initiate_swap: {
-          hashlock: params.hashlock,
-          timelock: params.timelock,
-          receiver: params.receiverAddress,
-          denom: params.fromToken === 'ATOM' ? 'uatom' : params.fromToken,
-          amount: (parseFloat(params.amount) * 1_000_000).toString(),
-        }
-      }
-
-      const result = await client.execute(
-        account.address,
-        COSMOS_CONTRACT_ADDRESS,
-        msg,
-        'auto',
-        'Initiate cross-chain swap',
-        [
-          {
-            denom: params.fromToken === 'ATOM' ? 'uatom' : params.fromToken,
-            amount: (parseFloat(params.amount) * 1_000_000).toString(),
-          }
-        ]
-      )
-
-      // Extract swap ID from events
-      const swapEvent = result.logs[0]?.events.find(event => event.type === 'wasm')
-      const swapIdAttr = swapEvent?.attributes.find(attr => attr.key === 'swap_id')
-      
-      if (swapIdAttr) {
-        return swapIdAttr.value
-      }
-      
-      throw new Error('Swap ID not found in transaction result')
-    } catch (error) {
-      console.error('Swap initiation failed:', error)
-      throw error
-    }
-  },
-
-  async withdraw(client: SigningCosmWasmClient, swapId: string, preimage: string): Promise<void> {
-    try {
-      const [account] = await client.getAccounts()
-      
-      const msg = {
-        withdraw: {
-          swap_id: swapId,
-          preimage: preimage,
-        }
-      }
-
-      await client.execute(
-        account.address,
-        COSMOS_CONTRACT_ADDRESS,
-        msg,
-        'auto',
-        'Withdraw from cross-chain swap'
-      )
-    } catch (error) {
-      console.error('Withdrawal failed:', error)
-      throw error
-    }
-  },
-
-  async refund(client: SigningCosmWasmClient, swapId: string): Promise<void> {
-    try {
-      const [account] = await client.getAccounts()
-      
-      const msg = {
-        refund: {
-          swap_id: swapId,
-        }
-      }
-
-      await client.execute(
-        account.address,
-        COSMOS_CONTRACT_ADDRESS,
-        msg,
-        'auto',
-        'Refund cross-chain swap'
-      )
-    } catch (error) {
-      console.error('Refund failed:', error)
-      throw error
-    }
-  },
-
-  async getSwap(client: SigningCosmWasmClient, swapId: string): Promise<any> {
-    try {
-      return await client.queryContractSmart(COSMOS_CONTRACT_ADDRESS, {
-        get_swap: { swap_id: swapId }
+      this.client = await SigningCosmWasmClient.connectWithSigner(COSMOS_RPC_URL, signer, {
+        gasPrice: GasPrice.fromString("0.025uatom"),
       })
+
+      const accounts = await signer.getAccounts()
+      if (accounts.length === 0) {
+        throw new Error("No accounts found")
+      }
+
+      const address = accounts[0].address
+      const balance = await this.getBalance(address)
+
+      return {
+        address,
+        balance,
+      }
     } catch (error) {
-      console.error('Get swap failed:', error)
+      console.error("Failed to connect to Cosmos:", error)
       throw error
     }
   }
+
+  async getBalance(address: string): Promise<CosmosBalance[]> {
+    if (!this.client) {
+      throw new Error("Client not connected")
+    }
+
+    try {
+      const balances = await this.client.getAllBalances(address)
+      return balances.map((balance) => ({
+        denom: balance.denom,
+        amount: balance.amount,
+      }))
+    } catch (error) {
+      console.error("Failed to get balance:", error)
+      return []
+    }
+  }
+
+  async simulateSwap(params: {
+    fromDenom: string
+    toDenom: string
+    amount: string
+    address: string
+  }) {
+    if (!this.client) {
+      throw new Error("Client not connected")
+    }
+
+    try {
+      // Mock simulation for now
+      const accounts = await this.client.getAccount(params.address)
+      if (!accounts) {
+        throw new Error("Account not found")
+      }
+
+      return {
+        estimatedOutput: (Number.parseFloat(params.amount) * 0.98).toString(),
+        fee: "5000",
+        gasUsed: "200000",
+      }
+    } catch (error) {
+      console.error("Failed to simulate swap:", error)
+      throw error
+    }
+  }
+
+  async executeSwap(params: {
+    fromDenom: string
+    toDenom: string
+    amount: string
+    address: string
+    memo?: string
+  }) {
+    if (!this.client) {
+      throw new Error("Client not connected")
+    }
+
+    try {
+      // Mock swap execution for now
+      const accounts = await this.client.getAccount(params.address)
+      if (!accounts) {
+        throw new Error("Account not found")
+      }
+
+      return {
+        transactionHash: "mock_tx_hash_" + Date.now(),
+        success: true,
+      }
+    } catch (error) {
+      console.error("Failed to execute swap:", error)
+      throw error
+    }
+  }
+
+  async getTokenInfo(denom: string) {
+    // Mock token info
+    const tokenMap: Record<string, any> = {
+      [COSMOS_DENOMS.ATOM]: {
+        denom: COSMOS_DENOMS.ATOM,
+        symbol: "ATOM",
+        name: "Cosmos",
+        decimals: 6,
+      },
+      [COSMOS_DENOMS.OSMO]: {
+        denom: COSMOS_DENOMS.OSMO,
+        symbol: "OSMO",
+        name: "Osmosis",
+        decimals: 6,
+      },
+      [COSMOS_DENOMS.JUNO]: {
+        denom: COSMOS_DENOMS.JUNO,
+        symbol: "JUNO",
+        name: "Juno",
+        decimals: 6,
+      },
+    }
+
+    return tokenMap[denom] || null
+  }
+
+  disconnect() {
+    this.client = null
+  }
 }
+
+export const cosmosService = new CosmosService()

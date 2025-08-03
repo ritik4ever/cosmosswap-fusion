@@ -14,7 +14,7 @@ export function useCosmos() {
   const [balance, setBalance] = useState<string>("0")
   const [isLoading, setIsLoading] = useState(false)
 
-  const getBalance = useCallback(async (address: string) => {
+  const getBalance = useCallback(async (_address: string) => {
     try {
       // Mock balance for now - replace with actual Cosmos API call
       const mockBalance = (Math.random() * 1000).toFixed(2)

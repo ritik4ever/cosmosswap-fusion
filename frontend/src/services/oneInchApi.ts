@@ -1,4 +1,4 @@
-const ONEINCH_API_KEY = import.meta.env.VITE_ONEINCH_API_KEY
+const ONEINCH_API_KEY = import.meta.env?.VITE_ONEINCH_API_KEY
 const ONEINCH_BASE_URL = "https://api.1inch.dev"
 
 export interface QuoteParams {
@@ -15,6 +15,18 @@ export interface SwapParams extends QuoteParams {
   fee?: number
 }
 
+export interface SwapQuote {
+  dstAmount: string
+  estimatedGas: string
+}
+
+export interface TokenInfo {
+  symbol: string
+  name: string
+  decimals: number
+  address: string
+}
+
 export class OneInchApi {
   private chainId: number
 
@@ -22,7 +34,7 @@ export class OneInchApi {
     this.chainId = chainId
   }
 
-  private async makeDirectRequest(endpoint: string, params: any = {}) {
+  private async makeDirectRequest(endpoint: string, params: any = {}): Promise<any> {
     if (!ONEINCH_API_KEY) {
       console.warn("1inch API key not found, using mock data")
       return this.getMockData(endpoint, params)
@@ -37,7 +49,7 @@ export class OneInchApi {
       })
 
       console.log("🔗 1inch Direct API Call:", endpoint)
-      
+
       const response = await fetch(url.toString(), {
         headers: {
           Authorization: `Bearer ${ONEINCH_API_KEY}`,
@@ -56,7 +68,7 @@ export class OneInchApi {
     }
   }
 
-  private getMockData(endpoint: string, params: any) {
+  private getMockData(endpoint: string, params: any): any {
     if (endpoint === "/quote") {
       return {
         dstAmount: (Number.parseFloat(params.amount || "1") * 245.8).toString(),
@@ -69,14 +81,13 @@ export class OneInchApi {
           symbol: "ETH",
           name: "Ethereum",
           decimals: 18,
-        }
+        },
       }
     }
     return { mock: true }
   }
 
-  async getQuote(params: QuoteParams) {
-    // Direct API call to 1inch (bypass backend)
+  async getQuote(params: QuoteParams): Promise<SwapQuote> {
     return this.makeDirectRequest("/quote", {
       src: params.fromTokenAddress,
       dst: params.toTokenAddress,
@@ -86,8 +97,7 @@ export class OneInchApi {
     })
   }
 
-  async getSwapTransaction(params: SwapParams) {
-    // Direct API call to 1inch (bypass backend)
+  async getSwapTransaction(params: SwapParams): Promise<any> {
     return this.makeDirectRequest("/swap", {
       src: params.fromTokenAddress,
       dst: params.toTokenAddress,
@@ -98,10 +108,10 @@ export class OneInchApi {
     })
   }
 
-  async getTokens() {
-    // Direct API call to 1inch (bypass backend)
+  async getTokens(): Promise<Record<string, TokenInfo>> {
     return this.makeDirectRequest("/tokens")
   }
 }
 
 export const oneInchApi = new OneInchApi()
+export const oneInchService = oneInchApi // Export alias for compatibility

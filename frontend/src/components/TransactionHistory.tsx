@@ -111,53 +111,53 @@ export function TransactionHistory({ ethAccount, cosmosAccount }: TransactionHis
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Transaction History</h1>
-        <p className="text-slate-400">View and track all your cross-chain swap transactions</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Transaction History</h1>
+        <p className="text-muted-foreground">View and track all your cross-chain swap transactions</p>
       </div>
 
       {/* Filters */}
-      <Card className="bg-slate-800/50 border-slate-700">
+      <Card className="bg-card/50 border-border backdrop-blur-sm">
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search transactions..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-slate-700 border-slate-600 text-white"
+                  className="pl-10 bg-background border-border text-foreground"
                 />
               </div>
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full md:w-40 bg-slate-700 border-slate-600 text-white">
+              <SelectTrigger className="w-full md:w-40 bg-background border-border text-foreground">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-slate-700">
-                <SelectItem value="all" className="text-white">
+              <SelectContent className="bg-popover border-border">
+                <SelectItem value="all" className="text-foreground">
                   All Status
                 </SelectItem>
-                <SelectItem value="completed" className="text-white">
+                <SelectItem value="completed" className="text-foreground">
                   Completed
                 </SelectItem>
-                <SelectItem value="pending" className="text-white">
+                <SelectItem value="pending" className="text-foreground">
                   Pending
                 </SelectItem>
-                <SelectItem value="failed" className="text-white">
+                <SelectItem value="failed" className="text-foreground">
                   Failed
                 </SelectItem>
               </SelectContent>
             </Select>
             <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-full md:w-40 bg-slate-700 border-slate-600 text-white">
+              <SelectTrigger className="w-full md:w-40 bg-background border-border text-foreground">
                 <SelectValue placeholder="Type" />
               </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-slate-700">
-                <SelectItem value="all" className="text-white">
+              <SelectContent className="bg-popover border-border">
+                <SelectItem value="all" className="text-foreground">
                   All Types
                 </SelectItem>
-                <SelectItem value="swap" className="text-white">
+                <SelectItem value="swap" className="text-foreground">
                   Swap
                 </SelectItem>
               </SelectContent>
@@ -169,7 +169,10 @@ export function TransactionHistory({ ethAccount, cosmosAccount }: TransactionHis
       {/* Transactions List */}
       <div className="space-y-4">
         {filteredTransactions.map((tx) => (
-          <Card key={tx.id} className="bg-slate-800/50 border-slate-700 hover:border-slate-600 transition-colors">
+          <Card
+            key={tx.id}
+            className="bg-card/50 border-border hover:border-primary/50 transition-colors backdrop-blur-sm"
+          >
             <CardContent className="p-6">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0">
                 <div className="flex items-center space-x-4">
@@ -178,16 +181,16 @@ export function TransactionHistory({ ethAccount, cosmosAccount }: TransactionHis
                     <Badge className={getStatusColor(tx.status)}>{tx.status}</Badge>
                   </div>
                   <div>
-                    <div className="flex items-center space-x-2 text-white font-medium">
+                    <div className="flex items-center space-x-2 text-foreground font-medium">
                       <span>
                         {tx.from.amount} {tx.from.token}
                       </span>
-                      <span className="text-slate-400">→</span>
+                      <span className="text-muted-foreground">→</span>
                       <span>
                         {tx.to.amount} {tx.to.token}
                       </span>
                     </div>
-                    <div className="flex items-center space-x-4 text-sm text-slate-400 mt-1">
+                    <div className="flex items-center space-x-4 text-sm text-muted-foreground mt-1">
                       <span>{formatDate(tx.timestamp)}</span>
                       <span>•</span>
                       <span>Fee: {tx.fee}</span>
@@ -197,8 +200,8 @@ export function TransactionHistory({ ethAccount, cosmosAccount }: TransactionHis
 
                 <div className="flex items-center space-x-4">
                   <div className="text-right">
-                    <div className="text-white font-medium">{tx.value}</div>
-                    <div className="text-sm text-slate-400">
+                    <div className="text-foreground font-medium">{tx.value}</div>
+                    <div className="text-sm text-muted-foreground">
                       {tx.from.network} → {tx.to.network}
                     </div>
                   </div>
@@ -206,17 +209,17 @@ export function TransactionHistory({ ethAccount, cosmosAccount }: TransactionHis
                     variant="ghost"
                     size="icon"
                     onClick={() => window.open(`https://etherscan.io/tx/${tx.txHash}`, "_blank")}
-                    className="text-slate-400 hover:text-white"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     <ExternalLink className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
 
-              <div className="mt-4 pt-4 border-t border-slate-700">
+              <div className="mt-4 pt-4 border-t border-border">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-400">Transaction ID:</span>
-                  <span className="text-white font-mono">{tx.id}</span>
+                  <span className="text-muted-foreground">Transaction ID:</span>
+                  <span className="text-foreground font-mono">{tx.id}</span>
                 </div>
               </div>
             </CardContent>
@@ -225,13 +228,13 @@ export function TransactionHistory({ ethAccount, cosmosAccount }: TransactionHis
       </div>
 
       {filteredTransactions.length === 0 && (
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-card/50 border-border backdrop-blur-sm">
           <CardContent className="p-12 text-center">
-            <div className="w-16 h-16 bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Search className="h-8 w-8 text-slate-400" />
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+              <Search className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h3 className="text-white font-medium mb-2">No transactions found</h3>
-            <p className="text-slate-400">Try adjusting your search criteria or filters</p>
+            <h3 className="text-foreground font-medium mb-2">No transactions found</h3>
+            <p className="text-muted-foreground">Try adjusting your search criteria or filters</p>
           </CardContent>
         </Card>
       )}
