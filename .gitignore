@@ -1,0 +1,67 @@
+# =========================
+# Node.js dependencies
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# =========================
+# Environment variables (ALL)
+# =========================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+**/.env
+**/.env.*
+
+# Allow example env files
+!.env.example
+
+# =========================
+# Build output
+# =========================
+dist/
+build/
+.next/
+out/
+.cache/
+frontend/.vite
+frontend/dist/
+
+# =========================
+# Logs
+# =========================
+logs
+*.log
+logs/*.log
+pids
+*.pid
+*.seed
+*.pid.lock
+backend/logs/
+
+# =========================
+# Editor & OS files
+# =========================
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# =========================
+# Blockchain & Hardhat Artifacts
+# =========================
+contracts/ethereum/artifacts/
+contracts/ethereum/cache/
+contracts/ethereum/typechain/
+contracts/ethereum/typechain-types/
+
+# =========================
+# Temporary script outputs
+# =========================
+scripts/output/
+*.generated.json

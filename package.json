@@ -1,0 +1,23 @@
+{
+  "name": "cosmosswap-fusion",
+  "version": "1.0.0",
+  "description": "1inch Fusion+ extension for Ethereum-Cosmos cross-chain swaps",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\"",
+    "backend:dev": "cd backend && npm run dev",
+    "frontend:dev": "cd frontend && npm run dev",
+    "build": "npm run contracts:build && npm run frontend:build",
+    "contracts:build": "cd contracts/ethereum && npx hardhat compile",
+    "frontend:build": "cd frontend && npm run build",
+    "test": "npm run contracts:test && npm run frontend:test",
+    "contracts:test": "cd contracts/ethereum && npx hardhat test",
+    "frontend:test": "cd frontend && npm run test",
+    "deploy": "./scripts/deploy-all.sh"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "author": "CosmosSwap Team",
+  "license": "MIT"
+}

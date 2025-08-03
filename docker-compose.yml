@@ -1,0 +1,85 @@
+```yaml
+version: '3.8'
+
+services:
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_BASE_URL=http://backend:3001/api
+      - VITE_ETHEREUM_RPC_URL=${ETHEREUM_RPC_URL}
+      - VITE_COSMOS_RPC_URL=${COSMOS_RPC_URL}
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+  # Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - ETHEREUM_RPC_URL=${ETHEREUM_RPC_URL}
+      - COSMOS_RPC_URL=${COSMOS_RPC_URL}
+      - ETHEREUM_CONTRACT_ADDRESS=${ETHEREUM_CONTRACT_ADDRESS}
+      - COSMOS_CONTRACT_ADDRESS=${COSMOS_CONTRACT_ADDRESS}
+      - ETHEREUM_PRIVATE_KEY=${ETHEREUM_PRIVATE_KEY}
+      - COSMOS_MNEMONIC=${COSMOS_MNEMONIC}
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - mongodb
+      - redis
+
+  # Database
+  mongodb:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_DATABASE=cosmosswap
+    volumes:
+      - mongodb_data:/data/db
+      - ./scripts/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  # Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  mongodb_data:
+  redis_data:
+
+networks:
+  default:
+    name: cosmosswap_network

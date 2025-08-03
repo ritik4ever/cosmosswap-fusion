@@ -1,0 +1,19 @@
+[package]
+name = "cosmosswap-cosmos"
+version = "1.0.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+cosmwasm-std = "1.3"
+cosmwasm-storage = "1.3"
+cw-storage-plus = "1.0"
+schemars = "0.8"
+serde = { version = "1.0", default-features = false, features = ["derive"] }
+thiserror = "1.0"
+sha2 = "0.10"
+
+[dev-dependencies]
+cosmwasm-vm = "1.3"
