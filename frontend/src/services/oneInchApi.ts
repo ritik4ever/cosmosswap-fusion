@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 const ONEINCH_API_KEY = import.meta.env.VITE_ONEINCH_API_KEY || ""
 const ONEINCH_BASE_URL = "https://api.1inch.dev"
 

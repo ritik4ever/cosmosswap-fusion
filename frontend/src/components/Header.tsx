@@ -31,7 +31,6 @@ export function Header({
   currentView,
   onViewChange,
   chainId,
-  onSwitchNetwork,
 }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
 

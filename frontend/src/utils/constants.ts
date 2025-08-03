@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 // Network configurations
 export const ETHEREUM_MAINNET_CHAIN_ID = Number(import.meta.env.VITE_ETHEREUM_CHAIN_ID || 1)
 export const ETHEREUM_RPC_URL = import.meta.env.VITE_ETHEREUM_RPC_URL || "https://mainnet.infura.io/v3/"

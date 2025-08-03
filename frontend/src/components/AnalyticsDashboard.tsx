@@ -8,7 +8,7 @@ interface AnalyticsDashboardProps {
   cosmosAccount: string
 }
 
-export function AnalyticsDashboard({ ethAccount, cosmosAccount }: AnalyticsDashboardProps) {
+export function AnalyticsDashboard({}: AnalyticsDashboardProps) {
   // Mock data - replace with actual API calls
   const stats = {
     totalVolume: "$2,456,789",

@@ -11,13 +11,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 
 interface SwapInterfaceProps {
   swapState: any
-  onExecuteSwap: (params: any) => Promise<void>
-  onGetQuote: (params: any) => Promise<void>
+  onExecuteSwap: (params: any) => Promise<any>  // Changed from Promise<void>
+  onGetQuote: (params: any) => Promise<any>     // Changed from Promise<void>
   ethAccount: string
   cosmosAccount: string
 }
 
-export function SwapInterface({ swapState, onExecuteSwap, onGetQuote, ethAccount, cosmosAccount }: SwapInterfaceProps) {
+export function SwapInterface({ onExecuteSwap, onGetQuote, ethAccount, cosmosAccount }: SwapInterfaceProps) {
   const [fromAmount, setFromAmount] = useState("")
   const [toAmount, setToAmount] = useState("")
   const [fromToken, setFromToken] = useState("ETH")
@@ -28,7 +28,7 @@ export function SwapInterface({ swapState, onExecuteSwap, onGetQuote, ethAccount
   const [quoteLoading, setQuoteLoading] = useState(false)
 
   // Mock token balances - replace with actual balance hooks
-  const [balances, setBalances] = useState({
+  const [balances] = useState({
     ETH: "2.5",
     USDC: "1000.0",
     USDT: "500.0",
@@ -82,13 +82,18 @@ export function SwapInterface({ swapState, onExecuteSwap, onGetQuote, ethAccount
 
     setQuoteLoading(true)
     try {
-      await onGetQuote({
+      const result = await onGetQuote({
         fromToken,
         toToken,
         amount: fromAmount,
       })
-      // Mock quote response
-      setToAmount((Number.parseFloat(fromAmount) * 245.8).toString())
+      // Use the result if it contains toAmount, otherwise use mock
+      if (result && result.toAmount) {
+        setToAmount(result.toAmount)
+      } else {
+        // Mock quote response
+        setToAmount((Number.parseFloat(fromAmount) * 245.8).toString())
+      }
     } catch (error) {
       console.error("Quote failed:", error)
     } finally {
@@ -105,7 +110,6 @@ export function SwapInterface({ swapState, onExecuteSwap, onGetQuote, ethAccount
 
   const isEthereumToken = (token: string) => ["ETH", "USDC", "USDT"].includes(token)
   const getNetworkBadge = (token: string) => (isEthereumToken(token) ? "Ethereum" : "Cosmos")
-  const getNetworkColor = (token: string) => (isEthereumToken(token) ? "blue" : "purple")
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">

@@ -51,7 +51,7 @@ export class CosmosService {
   }
 
   // Mock swap execution
-  async executeSwap(params: { fromDenom: string; toDenom: string; amount: string; address: string; memo?: string }) {
+  async executeSwap(_params: { fromDenom: string; toDenom: string; amount: string; address: string; memo?: string }) {
     return {
       transactionHash: "mock_tx_hash_" + Date.now(),
       success: true
