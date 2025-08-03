@@ -1,4 +1,4 @@
-# 🌌 CosmosSwap: 1inch Fusion+ Extension for Ethereum ↔ Cosmos
+#  CosmosSwap: 1inch Fusion+ Extension for Ethereum ↔ Cosmos
 
 > **Production-ready cross-chain atomic swap protocol extending 1inch Fusion+ to the Cosmos ecosystem**
 
@@ -8,21 +8,14 @@
 
 ---
 
-## 📖 PROJECT OVERVIEW
+##  PROJECT OVERVIEW
 
 CosmosSwap enables **secure, trustless cross-chain token swaps** between Ethereum and Cosmos ecosystems using **Hash Time Lock Contracts (HTLC)**.  
 Built as an extension to **1inch Fusion+**, it preserves all required security guarantees while providing a **seamless, production-ready user experience**.
 
-### 🏆 Hackathon Qualification Features
-✅ **Hashlock & Timelock Preservation** – Cryptographic security maintained  
-✅ **Bidirectional Swaps** – Ethereum ↔ Cosmos in both directions  
-✅ **Onchain Execution** – Full testnet deployment ready  
-✅ **Production UI** – Professional interface with light/dark modes  
-✅ **Partial Fills** – Advanced swap coordination  
-
 ---
 
-## 🛠️ TECHNICAL ARCHITECTURE
+##  TECHNICAL ARCHITECTURE
 
 ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
 │ Ethereum │ │ Coordinator │ │ Cosmos │
@@ -46,7 +39,7 @@ Edit
 
 ---
 
-## ⚙️ INSTALLATION & SETUP
+##  INSTALLATION & SETUP
 
 ### **Prerequisites**
 ```bash
@@ -87,7 +80,7 @@ Frontend: http://localhost:5173
 
 Backend: http://localhost:3001
 
-🖥️ USAGE GUIDE
+USAGE GUIDE
 1. Connect Wallets
 Connect MetaMask (Ethereum Sepolia testnet)
 
@@ -118,7 +111,7 @@ Hashlock Security: Cryptographic proof required
 
 Automatic Refunds: Failed swaps auto-refund after expiry
 
-🔐 SECURITY MODEL
+SECURITY MODEL
 Hash Time Lock Contracts (HTLC)
 
 solidity
@@ -144,7 +137,7 @@ Time Bounds – Automatic expiry prevents indefinite locks
 
 Cryptographic Proof – Secret revelation required for completion
 
-🧪 TESTING
+ TESTING
 Run all tests:
 
 bash
@@ -166,7 +159,7 @@ Frontend Components: 95%
 
 API Endpoints: 100%
 
-🚀 DEPLOYMENT
+ DEPLOYMENT
 Testnet Deployment
 bash
 Copy
@@ -180,7 +173,7 @@ Edit
 npm run deploy:mainnet
 npm run build
 npm run start
-📊 MONITORING & ANALYTICS
+ MONITORING & ANALYTICS
 Built-in Monitoring
 Real-time swap tracking
 
@@ -197,7 +190,7 @@ Timeout handling
 
 Multi-chain synchronization
 
-🛣️ ROADMAP
+ ROADMAP
 Phase 1 – Core Implementation
 
 HTLC smart contracts
@@ -228,7 +221,7 @@ Full 1inch integration
 
 Advanced analytics
 
-🤝 CONTRIBUTING
+ CONTRIBUTING
 Pull requests are welcome!
 
 Open an issue before major changes
@@ -237,10 +230,10 @@ Follow coding style
 
 Test before PR submission
 
-📄 LICENSE
+ LICENSE
 Licensed under the MIT License – see the LICENSE file for details.
 
-👨‍💻 AUTHOR
+ AUTHOR
 Ritik Patel
 
 GitHub: @ritik4ever
@@ -256,3 +249,4 @@ Edit
 If you want, I can also **add `.env.example` files for both frontend and backend** so anyone reading this README can deploy instantly to **Render + Vercel** without asking you for variable names.  
 
 Do you want me to make those too? That would make onboarding much easier.
+
